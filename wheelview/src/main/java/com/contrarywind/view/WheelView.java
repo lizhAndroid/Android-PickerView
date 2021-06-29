@@ -120,13 +120,13 @@ public class WheelView extends View {
     private int mGravity = Gravity.CENTER;
     private int drawCenterContentStart = 0;//中间选中文字开始绘制位置
     private int drawOutContentStart = 0;//非中间文字开始绘制位置
-    private static final float SCALE_CONTENT = 1F;//非中间文字则用此控制高度，压扁形成3d错觉
+    private static final float SCALE_CONTENT = 0;//非中间文字则用此控制高度，压扁形成3d错觉
     private float CENTER_CONTENT_OFFSET;//偏移量
 
     private boolean isAlphaGradient = false; //透明度渐变
 
     //是否开启3D
-    private boolean isOpen3D = true;
+    private boolean isOpen3D = false;
 
     public WheelView(Context context) {
         this(context, null);
@@ -201,7 +201,6 @@ public class WheelView extends View {
         paintCenterText = new Paint();
         paintCenterText.setColor(textColorCenter);
         paintCenterText.setAntiAlias(true);
-//        paintCenterText.setTextScaleX(1.1F);
         paintCenterText.setTypeface(typeface);
         paintCenterText.setTextSize(textSize);
 
@@ -225,12 +224,12 @@ public class WheelView extends View {
             //整个圆的周长除以PI得到直径，这个直径用作控件的总高度
             measuredHeight = (int) ((halfCircumference * 2) / Math.PI);
             if (paintCenterText.getTextScaleX() == paintOuterText.getTextScaleX()) {
-                paintCenterText.setTextScaleX(1.1F);
+//                paintCenterText.setTextScaleX(1F);
             }
         } else {
 //            itemsVisible = 5;//写死了不过可拓展
             if (paintCenterText.getTextScaleX() != paintOuterText.getTextScaleX()) {
-                paintCenterText.setTextScaleX(paintOuterText.getTextScaleX());
+//                paintCenterText.setTextScaleX(paintOuterText.getTextScaleX());
             }
             measuredHeight = (int) (itemHeight * (itemsVisible - 2));
         }
@@ -577,7 +576,10 @@ public class WheelView extends View {
             while (counter < itemsVisible) {
                 Object showText;
                 int index = preCurrentIndex - (itemsVisible / 2 - counter);//索引值，即当前在控件中间的item看作数据源的中间，计算出相对源数据源的index值
-
+                double radian = ((itemHeight * counter - itemHeightOffset)) / radius;
+                // 弧度转换成角度(把半圆以Y轴为轴心向右转90度，使其处于第一象限及第四象限
+                // angle [-90°,90°]
+                float angle = (float) (90D - (radian / Math.PI) * 180D);//item第一项,从90度开始，逐渐递减到 -90度
                 //判断是否循环，如果是循环数据源也使用相对循环的position获取对应的item值，如果不是循环则超出数据源范围使用""空白字符串填充，在界面上形成空白无数据的item项
                 if (isLoop) {
                     index = getLoopMappingIndex(index);
@@ -613,6 +615,7 @@ public class WheelView extends View {
                     // 条目经过第一条线
                     canvas.save();
                     canvas.clipRect(0, 0, measuredWidth, firstLineY - translateY);
+                    setOutPaintStyle(0, angle);
                     canvas.drawText(contentText, drawOutContentStart, maxTextHeight, paintOuterText);
                     canvas.restore();
                     canvas.save();
@@ -627,6 +630,7 @@ public class WheelView extends View {
                     canvas.restore();
                     canvas.save();
                     canvas.clipRect(0, secondLineY - translateY, measuredWidth, (int) (itemHeight));
+                    setOutPaintStyle(0, angle);
                     canvas.drawText(contentText, drawOutContentStart, maxTextHeight, paintOuterText);
                     canvas.restore();
                 } else if (translateY >= firstLineY && maxTextHeight + translateY <= secondLineY) {
@@ -639,6 +643,7 @@ public class WheelView extends View {
                     //设置选中项
                     selectedItem = preCurrentIndex - (itemsVisible / 2 - counter);
                 } else {
+                    setOutPaintStyle(0, angle);
                     canvas.drawText(contentText, drawOutContentStart, maxTextHeight, paintOuterText);
                 }
                 canvas.restore();
@@ -648,8 +653,10 @@ public class WheelView extends View {
         }
     }
 
+    private static final String TAG = "WheelView";
     //设置文字倾斜角度，透明度
     private void setOutPaintStyle(float offsetCoefficient, float angle) {
+        Log.e(TAG, "setOutPaintStyle: "+angle);
         // 控制文字倾斜角度
         float DEFAULT_TEXT_TARGET_SKEW_X = 0.5f;
         int multiplier = 0;
@@ -892,7 +899,7 @@ public class WheelView extends View {
     public void setTextXOffset(int textXOffset) {
         this.textXOffset = textXOffset;
         if (textXOffset != 0) {
-            paintCenterText.setTextScaleX(1.0f);
+//            paintCenterText.setTextScaleX(1.0f);
         }
     }
 
@@ -922,11 +929,11 @@ public class WheelView extends View {
         if (!isOpen3D) {
 //            itemsVisible = 5;//此处未做拓展
             if (paintCenterText.getTextScaleX() != paintOuterText.getTextScaleX()) {
-                paintCenterText.setTextScaleX(paintOuterText.getTextScaleX());
+//                paintCenterText.setTextScaleX(paintOuterText.getTextScaleX());
             }
         } else {
             if (paintCenterText.getTextScaleX() == paintOuterText.getTextScaleX()) {
-                paintCenterText.setTextScaleX(1.1F);
+//                paintCenterText.setTextScaleX(1F);
             }
         }
     }
