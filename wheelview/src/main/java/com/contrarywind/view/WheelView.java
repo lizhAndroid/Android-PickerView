@@ -73,7 +73,7 @@ public class WheelView extends View {
     private float itemHeight;//每行高度
 
 
-    private Typeface typeface = Typeface.MONOSPACE;//字体样式，默认是等宽字体
+    private Typeface typeface = Typeface.DEFAULT;//字体样式，默认是等宽字体
     private int textColorOut;
     private int textColorCenter;
     private int dividerColor;
@@ -120,7 +120,7 @@ public class WheelView extends View {
     private int mGravity = Gravity.CENTER;
     private int drawCenterContentStart = 0;//中间选中文字开始绘制位置
     private int drawOutContentStart = 0;//非中间文字开始绘制位置
-    private static final float SCALE_CONTENT = 0.8F;//非中间文字则用此控制高度，压扁形成3d错觉
+    private static final float SCALE_CONTENT = 1F;//非中间文字则用此控制高度，压扁形成3d错觉
     private float CENTER_CONTENT_OFFSET;//偏移量
 
     private boolean isAlphaGradient = false; //透明度渐变
@@ -201,7 +201,7 @@ public class WheelView extends View {
         paintCenterText = new Paint();
         paintCenterText.setColor(textColorCenter);
         paintCenterText.setAntiAlias(true);
-        paintCenterText.setTextScaleX(1.1F);
+//        paintCenterText.setTextScaleX(1.1F);
         paintCenterText.setTypeface(typeface);
         paintCenterText.setTextSize(textSize);
 
